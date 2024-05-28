@@ -1,0 +1,8 @@
+body {
+    padding: 10px;
+}
+
+textarea {
+    height: 50vh;
+    width: 50vw;
+}
