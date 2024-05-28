@@ -12,7 +12,10 @@ def create_listing(request):
         return render(request, "auctions/create_listing.html")
 
 def index(request):
-    return render(request, "auctions/index.html")
+    listings = ['test_listing']
+    return render(request, "auctions/index.html", {
+        "listings": listings,
+    })
 
 
 def login_view(request):
