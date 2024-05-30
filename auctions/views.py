@@ -4,23 +4,52 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Listing, Category
 
 
 def create_listing(request):
-    if request.method== "GET":
-        return render(request, "auctions/create_listing.html")
+    if request.method == "GET":
+        allCategories = Category.objects.all()
+        return render(request, "auctions/create_listing.html", {
+            "categories": allCategories,
+        })
+    else:
+        title = request.POST['listing_title']
+        description = request.POST['listing_description']
+        imageURL = request.POST['listing_image_url']
+        price = request.POST['listing_start_price']
+        category = request.POST['listing_category']
+        categoryData = Category.objects.get(categoryName=category)
+        currentUser = request.user
+        # Create new listing
+        newListing = Listing(
+            title=title,
+            description=description,
+            imageURL=imageURL,
+            price=float(price),
+            category=categoryData,
+            seller=currentUser
+        )
+        newListing.save()
+        return HttpResponseRedirect(reverse("auctions:index"))
+
 
 def index(request):
-    listings = ['test_listing']
+    active_listings = Listing.objects.filter(isActive=True)
     return render(request, "auctions/index.html", {
-        "listings": listings,
+        "listings": active_listings,
+    })
+
+
+def listing(request, title):
+    requested_listing = Listing.objects.all()
+    return render(request, "auctions/listing.html", {
+        "listing": requested_listing,
     })
 
 
 def login_view(request):
     if request.method == "POST":
-
         # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
@@ -29,7 +58,7 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("auctions:index"))
         else:
             return render(request, "auctions/login.html", {
                 "message": "Invalid username and/or password."
@@ -40,14 +69,13 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("auctions:index"))
 
 
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
-
         # Ensure password matches confirmation
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]

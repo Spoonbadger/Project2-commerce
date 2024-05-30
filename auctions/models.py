@@ -5,27 +5,24 @@ from django.db import models
 class User(AbstractUser):
     pass
 
+class Category(models.Model):
+    categoryName = models.CharField(max_length=64)
 
-class Auction_listing():
-    listing_title = ...
-    listing_description = ...
-    starting_price = ...
-    current_bid = ...
-    sale_price = ...
-    picture_url = ...
+    def __str__(self):
+        return self.categoryName
 
 
+class Listing(models.Model):
+    title = models.CharField(max_length=64)
+    description = models.CharField(max_length=640)
+    imageURL = models.CharField(max_length=640)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    isActive = models.BooleanField(default=True)
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name="seller")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, related_name="category")
 
-class bids():
-    ...
-
-
-class listing_comments():
-    comment = ...
-    comment_by_username = ...
-    
-
-
+    def __str__(self):
+        return self.title
 
 """
 You will also need to add additional models to this file to represent details about auction listings, bids, comments, and auction categories. 

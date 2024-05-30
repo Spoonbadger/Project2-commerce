@@ -4,11 +4,14 @@
     <h2>Active Listings</h2>
 
     <ul>
-    {% for listing in listings %}
+        {% for listing in listings %}
         <li>
-            {{ listing }}
-        </li>
-    {% endfor %}
+            <h4>{{ listing.title }}</h4>
+            {{ listing.description }}<br>
+            {{ listing.price }}<br>
+            {{ listing.imageURL }}<br>
+        </li><br>
+        {% endfor %}
     </ul>
 {% endblock %}
 

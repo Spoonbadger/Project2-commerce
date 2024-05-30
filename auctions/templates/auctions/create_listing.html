@@ -3,26 +3,26 @@
 {% block body %}
     <h2>Create Listing</h2>
 
-    <form action="{% url 'create_listing' %}" method="POST">
+    <form action="{% url 'auctions:create_listing' %}" method="POST">
         {% csrf_token %}
-        <label>Title:</label>
-        <input type="text" style="width: 500px" maxlength="64"><br>
-        <label>Description:</label><br>
-        <textarea></textarea><br>
-        <label for="categories">Category:</label>
-        <select name="categories" id="categories">
-            <option value="blank"></option>
-            <option value="Electronics">Electronics</option>
-            <option value="Fashion">Fashion</option>
-            <option value="Home">Home</option>
-            <option value="Toys">Toys</option>
+        <label for="title">Title:</label>
+        <input type="text" class="form-control" style="width: 500px" id="title" maxlength="64" name="listing_title"><br>
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="listing_description"></textarea><br>
+        <label for="category">Category:</label> 
+        <select name="listing_category" id="category">
+            {% for category in categories %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
         </select><br>
-        <label>Image URL (optional):</label>
-        <input type="text" name="image_url"><br>
-        <label>Starting bid:</label>
-        <input type="numeric" min="0" step="any" placeholder="0.00">
+        <label for="image_url">Image URL (optional):</label>
+        <input type="text" id="image_url" name="listing_image_url"><br>
+        <label for="starting_price">Starting bid:</label>
+        <input type="numeric" id="starting_price" min="0" step="any" placeholder="0.00" name="listing_start_price">
+        <button class="btn btn-primary" type="submit">Post Listing</button>
     </form>
 {% endblock %}
+
 
 
 <!--
