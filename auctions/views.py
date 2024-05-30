@@ -57,10 +57,12 @@ def index(request):
 
 
 def listing(request, title):
+    listing_in_watchlist = False
     requested_listing = Listing.objects.get(title=title)
     return render(request, "auctions/listing.html", {
         "title": title,
         "listing": requested_listing,
+        "listing_in_watchlist": listing_in_watchlist,
     })
 
 """
@@ -121,3 +123,8 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+def watchlist(request):
+    watchlist = User.objects.watchlist()
+    return render(request, "auctions/watchlist.html")

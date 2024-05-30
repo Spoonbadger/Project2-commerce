@@ -3,7 +3,12 @@
 {% block body %}
     <h2>Watchlist</h2>
 
-    TODO
+    {% for listing in watchlist %}
+        Listing: {{ listing.title }}
+        Current Price: ${{ listing.price }}
+        
+    {% endfor %}
+
 {% endblock %}
 
 
