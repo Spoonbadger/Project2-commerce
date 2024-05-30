@@ -7,6 +7,21 @@ from django.urls import reverse
 from .models import User, Listing, Category
 
 
+def categories(request):
+    if request.method == "GET":
+        categories = Category.objects.all()
+        return render(request, "auctions/categories.html", {
+            "categories": categories,
+        })
+    else:
+        selected_category_id = request.POST['selected_category']
+        selected_category = Category.objects.get(pk=selected_category_id)
+        category_listings = Listing.objects.filter(isActive=True, category=selected_category)
+        return render(request, "auctions/index.html", {
+            "listings": category_listings
+        })
+
+
 def create_listing(request):
     if request.method == "GET":
         allCategories = Category.objects.all()
@@ -35,18 +50,28 @@ def create_listing(request):
 
 
 def index(request):
-    active_listings = Listing.objects.filter(isActive=True)
-    return render(request, "auctions/index.html", {
-        "listings": active_listings,
-    })
+        active_listings = Listing.objects.filter(isActive=True)
+        return render(request, "auctions/index.html", {
+            "listings": active_listings,
+        })
 
 
 def listing(request, title):
-    requested_listing = Listing.objects.all()
+    requested_listing = Listing.objects.get(title=title)
     return render(request, "auctions/listing.html", {
+        "title": title,
         "listing": requested_listing,
     })
 
+"""
+        title = request.POST['listing_title']
+        description = request.POST['listing_description']
+        imageURL = request.POST['listing_image_url']
+        price = request.POST['listing_start_price']
+        category = request.POST['listing_category']
+        categoryData = Category.objects.get(categoryName=category)
+        currentUser = request.user
+"""
 
 def login_view(request):
     if request.method == "POST":

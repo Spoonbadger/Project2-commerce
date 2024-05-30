@@ -3,12 +3,12 @@
 {% block body %}
     <h2>{{ listing }}</h2>
 
-    <li>
-        <h4>{{ listing.title }}</h4>
-        {{ listing.description }}<br>
-        {{ listing.price }}<br>
-        {{ listing.imageURL }}<br>
-    </li><br>
+
+        Description: {{ listing.description }}<br>
+        Price: ${{ listing.price }}<br>
+        ImageURL: {{ listing.imageURL }}<br>
+        Seller: {{ listing.seller }}<br>
+
 {% endblock %}
 
 

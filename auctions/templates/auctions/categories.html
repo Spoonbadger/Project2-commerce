@@ -3,7 +3,17 @@
 {% block body %}
     <h2>Listing Categories</h2>
 
-    TODO
+    <form action="{% url 'auctions:categories' %}" method="POST">
+        {% csrf_token %}
+        <ul>
+            {% for category in categories %}
+                <li>
+                    <button type="submit" name="selected_category" value="{{ category.id }}" class="btn btn-link">{{ category }}</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </form>
+
 {% endblock %}
 
 <!--

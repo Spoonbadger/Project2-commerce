@@ -2,18 +2,21 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-    <ul>
-        {% for listing in listings %}
-        <li>
-            <h4>{{ listing.title }}</h4>
-            {{ listing.description }}<br>
-            {{ listing.price }}<br>
-            {{ listing.imageURL }}<br>
-        </li><br>
-        {% endfor %}
-    </ul>
+    <h6><a href="{% url 'auctions:categories' %}">Categories</a><br></h6>
+    
+        <ul>
+            {% for listing in listings %}
+            <li>
+                <a href="{% url 'auctions:listing' title=listing.title %}" class="btn btn-link">{{ listing.title }}</a><br>
+                Description: {{ listing.description }}<br>
+                Current Price: ${{ listing.price }}<br>
+                ImageURL: {{ listing.imageURL }}<br>
+                Seller: {{ listing.seller }}
+            </li><br>
+            {% endfor %}
+        </ul>
 {% endblock %}
+
 
 
 <!--
