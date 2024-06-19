@@ -2,20 +2,29 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
-    pass
+class Bids(models.Model):
+    current_bid = ...
+    all_bids = ...
+    starting_bid = ...
+
 
 class Category(models.Model):
     categoryName = models.CharField(max_length=64)
 
     def __str__(self):
         return self.categoryName
+    
+
+class Comments(models.Model):
+    comment = ...
+    user = ...
+    item_listing = ...
 
 
 class Listing(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=640)
-    imageURL = models.CharField(max_length=640)
+    imageURL = models.URLField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     isActive = models.BooleanField(default=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name="seller")
@@ -24,6 +33,12 @@ class Listing(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class User(AbstractUser):
+    pass
+
+
 
 """
 You will also need to add additional models to this file to represent details about auction listings, bids, comments, and auction categories. 
