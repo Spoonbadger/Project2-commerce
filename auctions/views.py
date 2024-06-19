@@ -29,24 +29,27 @@ def create_listing(request):
             "categories": allCategories,
         })
     else:
-        title = request.POST['listing_title']
-        description = request.POST['listing_description']
-        imageURL = request.POST['listing_image_url']
-        price = request.POST['listing_start_price']
-        category = request.POST['listing_category']
-        categoryData = Category.objects.get(categoryName=category)
-        currentUser = request.user
-        # Create new listing
-        newListing = Listing(
-            title=title,
-            description=description,
-            imageURL=imageURL,
-            price=float(price),
-            category=categoryData,
-            seller=currentUser
-        )
-        newListing.save()
-        return HttpResponseRedirect(reverse("auctions:index"))
+        try:
+            title = request.POST['listing_title']
+            description = request.POST['listing_description']
+            imageURL = request.POST['listing_image_url']
+            price = request.POST['listing_start_price']
+            category = request.POST['listing_category']
+            categoryData = Category.objects.get(categoryName=category)
+            currentUser = request.user
+            # Create new listing
+            newListing = Listing(
+                title=title,
+                description=description,
+                imageURL=imageURL,
+                price=float(price),
+                category=categoryData,
+                seller=currentUser
+            )
+            newListing.save()
+            return HttpResponseRedirect(reverse("auctions:index"))
+        except ValueError as e:
+            print(f"Value Error: {e}") 
 
 
 def index(request):
@@ -126,5 +129,14 @@ def register(request):
 
 
 def watchlist(request):
-    watchlist = User.objects.watchlist()
-    return render(request, "auctions/watchlist.html")
+    active_listings_in_watchlist = Listing.objects.filter(isActive=True)
+    return render(request, "auctions/watchlist.html", {
+        "listings": active_listings_in_watchlist,
+    })
+
+def remove_from_watchlist(request):
+    ...
+
+
+def add_to_watchlist(request):
+    ...

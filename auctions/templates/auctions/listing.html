@@ -5,12 +5,12 @@
 
     {% if user.is_authenticated %}
         {% if listing_in_watchlist %}
-            <form action="{% url 'auctions:listing' %}" method="POST">
+            <form action="{% url 'auctions:listing' title=listing.title %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-light" name="remove_from_watchlist">Remove from Watchlist</button>
             </form>
         {% else %}
-            <form action="{% url 'auctions:listing' %}" method="POST">
+            <form action="{% url 'auctions:listing' title=listing.title %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" name="add_to_watchlist">Add to Watchlist</button>
             </form>
@@ -18,14 +18,16 @@
         {% endif %}
     {% endif %}<br>
 
+    <p>
         Description: {{ listing.description }}<br>
         Price: ${{ listing.price }}<br>
         Image: {{ listing.imageURL }}<br>
         Seller: {{ listing.seller }}<br>
-        <form action="{% url 'auctions:listing' %}" method="POST">
-            Bid:
-            <button>Submit Bid</button>
-        </form>
+    </p>
+    <form action="{% url 'auctions:listing' title=listing.title %}" method="POST">
+        Bid:
+        <button>Submit Bid</button>
+    </form>
 
 {% endblock %}
 
