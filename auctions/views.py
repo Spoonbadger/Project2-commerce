@@ -60,13 +60,19 @@ def index(request):
 
 
 def listing(request, title):
-    listing_in_watchlist = False
-    requested_listing = Listing.objects.get(title=title)
-    return render(request, "auctions/listing.html", {
-        "title": title,
-        "listing": requested_listing,
-        "listing_in_watchlist": listing_in_watchlist,
-    })
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            current_user = request.user
+            requested_listing = Listing.objects.get(title=title)
+            listing_in_watchlist = False
+            if requested_listing in current_user.watchlist.all():
+                listing_in_watchlist = True
+            return render(request, "auctions/listing.html", {
+                "title": title,
+                "listing": requested_listing,
+                "listing_in_watchlist": listing_in_watchlist,
+            })
+        
 
 """
         title = request.POST['listing_title']
@@ -129,14 +135,28 @@ def register(request):
 
 
 def watchlist(request):
-    active_listings_in_watchlist = Listing.objects.filter(isActive=True)
-    return render(request, "auctions/watchlist.html", {
-        "listings": active_listings_in_watchlist,
+    if request.user.is_authenticated:
+        current_user = request.user
+        listings_in_watchlist = current_user.watchlist.all()
+        return render(request, "auctions/watchlist.html", {
+            "watchlistings": listings_in_watchlist,
     })
 
-def remove_from_watchlist(request):
-    ...
+
+def add_to_watchlist(request, title):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            listing_to_add = Listing.objects.get(title=title)
+            current_user = request.user
+            current_user.watchlist.add(listing_to_add)
+            return HttpResponseRedirect(reverse("auctions:listing", args=(title, )))
 
 
-def add_to_watchlist(request):
-    ...
+
+def remove_from_watchlist(request, title):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            listing_to_remove = Listing.objects.get(title=title)
+            current_user = request.user
+            current_user.watchlist.remove(listing_to_remove)
+            return HttpResponseRedirect(reverse("auctions:listing", args=(title, )))

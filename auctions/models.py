@@ -1,11 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
-class User(AbstractUser):
-    pass
-
-
 class Bids(models.Model):
     current_bid = ...
     all_bids = ...
@@ -31,12 +26,19 @@ class Listing(models.Model):
     imageURL = models.URLField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     isActive = models.BooleanField(default=True)
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name="seller")
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, related_name="category")
-    watchlist = models.ManyToManyField(User, blank=True, related_name="watchlist_users")
+    seller = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, related_name="seller")
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, related_name="category")
+
 
     def __str__(self):
         return self.title
+
+
+class User(AbstractUser):   
+    watchlist = models.ManyToManyField('Listing', blank=True, related_name="watchlisted_by")
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 
