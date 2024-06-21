@@ -5,7 +5,7 @@ from .models import Bids, Comments, Listing, Category, User
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["username", "email",]
+    list_display = ["username", "email", ]
     filter_horizontal = ("watchlist", )
 
 

@@ -34,7 +34,7 @@ class Listing(models.Model):
         return self.title
 
 
-class User(AbstractUser):   
+class User(AbstractUser):
     watchlist = models.ManyToManyField('Listing', blank=True, related_name="user_watching")
 
     def __str__(self):

@@ -1,7 +1,7 @@
-{% extends "auctions/layout.html" %}
+{% extends 'auctions/layout.html' %}
 
 {% block body %}
-    <h2>Watchlist</h2>
+    <h1>Watchlist</h1>
 
     {% if user.is_authenticated %}
         <ul>
@@ -14,10 +14,7 @@
         </ul>
     {% endif %}
 
-
 {% endblock %}
-
-
 
 <!--
     Watchlist: 
