@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from .models import User, Listing, Category
@@ -62,27 +62,22 @@ def index(request):
 def listing(request, title):
     if request.method == "GET":
         if request.user.is_authenticated:
-            current_user = request.user
             requested_listing = Listing.objects.get(title=title)
-            listing_in_watchlist = False
-            if requested_listing in current_user.watchlist.all():
-                listing_in_watchlist = True
+            watchlisted = False
+            user = request.user
+            if requested_listing in user.watchlist.all():
+                watchlisted = True
             return render(request, "auctions/listing.html", {
-                "title": title,
                 "listing": requested_listing,
-                "listing_in_watchlist": listing_in_watchlist,
+                "watchlisted": watchlisted,
+            })
+        else:
+            requested_listing = Listing.objects.get(title=title)
+            return render(request, "auctions/listing.html", {
+                "listing": requested_listing,
             })
         
 
-"""
-        title = request.POST['listing_title']
-        description = request.POST['listing_description']
-        imageURL = request.POST['listing_image_url']
-        price = request.POST['listing_start_price']
-        category = request.POST['listing_category']
-        categoryData = Category.objects.get(categoryName=category)
-        currentUser = request.user
-"""
 
 def login_view(request):
     if request.method == "POST":
@@ -125,7 +120,7 @@ def register(request):
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "auctions/register.html", {
+            return render(request, ("auctions/register.html"), {
                 "message": "Username already taken."
             })
         login(request, user)
@@ -136,27 +131,31 @@ def register(request):
 
 def watchlist(request):
     if request.user.is_authenticated:
-        current_user = request.user
-        listings_in_watchlist = current_user.watchlist.all()
-        return render(request, "auctions/watchlist.html", {
-            "watchlistings": listings_in_watchlist,
-    })
+        # Get all the listings in the watchlist, get user first
+        user = request.user
+        watchlistings = user.watchlist.all()
+        return render(request, ("auctions/watchlist.html"), {
+            "watchlistings": watchlistings
+        })
+
 
 
 def add_to_watchlist(request, title):
     if request.method == "POST":
         if request.user.is_authenticated:
-            listing_to_add = Listing.objects.get(title=title)
-            current_user = request.user
-            current_user.watchlist.add(listing_to_add)
+            # I need to get the user, get the listing, add listing to watchlist
+            user = request.user
+            listing = Listing.objects.get(title=title)
+            user.watchlist.add(listing)
             return HttpResponseRedirect(reverse("auctions:listing", args=(title, )))
-
+        else:
+            return redirect("auctions/listing.html")
 
 
 def remove_from_watchlist(request, title):
     if request.method == "POST":
         if request.user.is_authenticated:
-            listing_to_remove = Listing.objects.get(title=title)
-            current_user = request.user
-            current_user.watchlist.remove(listing_to_remove)
-            return HttpResponseRedirect(reverse("auctions:listing", args=(title, )))
+            user = request.user
+            listing = Listing.objects.get(title=title)
+            user.watchlist.remove(listing)
+    return HttpResponseRedirect(reverse("auctions:listing", args=(title, )))

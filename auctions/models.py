@@ -35,11 +35,10 @@ class Listing(models.Model):
 
 
 class User(AbstractUser):   
-    watchlist = models.ManyToManyField('Listing', blank=True, related_name="watchlisted_by")
+    watchlist = models.ManyToManyField('Listing', blank=True, related_name="user_watching")
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-
 
 
 

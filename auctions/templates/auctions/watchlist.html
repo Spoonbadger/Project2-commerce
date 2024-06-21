@@ -1,18 +1,19 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Watchlist</h2><br>
+    <h2>Watchlist</h2>
 
-    <ul>
-        {% for listing in watchlistings %}
-            <li>
-                Listing: <a href="{% url 'auctions:listing' title=listing.title %}">{{ listing.title }}</a><br>
-                Current Price: ${{ listing.price }}
-            </li><br>
-        {% empty %}
-            <h6>No listings in watchlist.</h6>  
-        {% endfor %}
-    </ul>
+    {% if user.is_authenticated %}
+        <ul>
+            {% for listing in watchlistings %}
+                <li>
+                    <a href="{% url 'auctions:listing' title=listing.title %}">{{ listing.title }}</a><br>
+                    {{ listing.price }}
+                </li><br>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
 
 {% endblock %}
 

@@ -1,22 +1,23 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>{{ listing }}</h2>
+    <h1>{{ listing.title }}</h1>
 
     {% if user.is_authenticated %}
-        {% if listing_in_watchlist %}
+        {% if watchlisted %}
             <form action="{% url 'auctions:remove_from_watchlist' title=listing.title %}" method="POST">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-light" name="remove_from_watchlist">Remove from Watchlist</button>
-            </form>
+                <button type=submit class="btn btn-light" name="remove_from_watchlist">Remove from Watchlist</button>
+            </form><br>
         {% else %}
             <form action="{% url 'auctions:add_to_watchlist' title=listing.title %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" name="add_to_watchlist">Add to Watchlist</button>
-            </form>
-
+            </form><br>
         {% endif %}
-    {% endif %}<br>
+
+    {% endif %}
+    
 
     <p>
         Description: {{ listing.description }}<br>
