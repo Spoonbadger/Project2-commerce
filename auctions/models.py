@@ -1,10 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-class Bids(models.Model):
-    current_bid = ...
-    all_bids = ...
-    starting_bid = ...
+class Bid(models.Model):
+    new_bid = models.DecimalField(max_digits=10, decimal_places=2)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="bidding_user")
+    starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class Category(models.Model):
@@ -23,11 +23,11 @@ class Comments(models.Model):
 class Listing(models.Model):
     title = models.CharField(max_length=64)
     description = models.TextField()
-    imageURL = models.URLField(max_length=200)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    imageURL = models.URLField(max_length=200, blank=True)
+    price = models.ForeignKey('Bid', on_delete=models.CASCADE, related_name="bid")
     isActive = models.BooleanField(default=True)
     seller = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, related_name="seller")
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, related_name="category")
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name="category")
 
 
     def __str__(self):

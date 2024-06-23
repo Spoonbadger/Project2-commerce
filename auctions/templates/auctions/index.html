@@ -11,7 +11,7 @@
                     Description: {{ listing.description }}<br>
                     Current Price: ${{ listing.price }}<br>
                     ImageURL: {{ listing.imageURL }}<br>
-                    Seller: {{ listing.seller }}
+                    Seller: {{ listing.seller.username }}
                 </li><br>
             {% empty %}
                 <li>No Listings.</li>

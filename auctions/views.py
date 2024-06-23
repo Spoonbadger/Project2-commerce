@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User, Listing, Category
+from .models import User, Listing, Category, Bid
 
 
 def categories(request):
@@ -37,13 +37,16 @@ def create_listing(request):
                 price = request.POST['listing_start_price']
                 category = request.POST['listing_category']
                 categoryData = Category.objects.get(categoryName=category)
-                seller = request.user
+                seller = request.user.username
+                user = request.user
+                starting_price = Bid(starting_price=float(price), user=user)
+                starting_price.save()
                 # Create new listing
                 newListing = Listing(
                     title=title,
                     description=description,
                     imageURL=imageURL,
-                    price=float(price),
+                    price=float(starting_price),
                     category=categoryData,
                     seller=seller
                 )
@@ -62,20 +65,28 @@ def index(request):
 
 def listing(request, title):
     listing = Listing.objects.get(title=title)
-    if request.user.is_authenticated:
-        user = request.user
-        in_watchlist = False
-        if listing in user.watchlist.all():
-            in_watchlist = True
-        return render(request, "auctions/listing.html", {
-            "listing": listing,
-            "in_watchlist": in_watchlist
-        })
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            user = request.user
+            in_watchlist = False
+            if listing in user.watchlist.all():
+                in_watchlist = True
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+                "in_watchlist": in_watchlist
+            })
+        else:
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+            })
     else:
-        return render(request, "auctions/listing.html", {
-            "listing": listing,
-        })
-        
+        if request.user.is_authenticated:
+            new_bid_price = ...
+            if new_bid_price > listing.price:
+                listing.price = new_bid_price
+                listing.save()
+            return redirect("auctions:listing", title=title)
+        return redirect("auctions:listing", title=title)
 
 
 def login_view(request):
@@ -100,6 +111,10 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("auctions:index"))
+
+
+def new_bid(request):
+    return
 
 
 def register(request):
