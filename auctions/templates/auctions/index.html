@@ -10,6 +10,7 @@
                     <a href="{% url 'auctions:listing' title=listing.title %}" class="btn btn-link">{{ listing.title }}</a><br>
                     Description: {{ listing.description }}<br>
                     Current Price: ${{ listing.current_bid.new_bid }}<br>
+                    Highest bidder: {{ listing.current_bid.user.username }}<br>
                     ImageURL: {{ listing.imageURL }}<br>
                     Seller: {{ listing.seller.username }}
                 </li><br>

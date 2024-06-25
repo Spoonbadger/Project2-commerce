@@ -30,7 +30,11 @@
         {% csrf_token %}
         <label>Bid: $</label>
         <input type="number" min="{{ listing.current_bid.new_bid }}" step="any" placeholder="{{ listing.current_bid.new_bid }}" name="bid" required>
-        <button type="submit" class="btn btn-success" name="submit_bid">Submit Bid</button>
+        {% if user.is_authenticated %}
+            <button type="submit" class="btn btn-success" name="submit_bid">Submit Bid</button>
+        {% else %}
+            <a href="{% url 'auctions:login' %}">Login to place bid</a>
+        {% endif %}
     </form>
 
 {% endblock %}

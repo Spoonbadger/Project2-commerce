@@ -109,22 +109,25 @@ def logout_view(request):
 
 
 def new_bid(request, id):
-    new_bid = float(request.POST['bid'])
-    listing = Listing.objects.get(pk=id)
-    if new_bid > listing.current_bid.new_bid:
-        update_bid = Bid(user=request.user, new_bid=new_bid)
-        update_bid.save()
-        listing.current_bid = update_bid
-        listing.save()
-        return render (request, "auctions/listing.html", {
-            "listing": listing,
-            "message": "You're the highest bidder!"
-        })
+    if request.user.is_authenticated:
+        new_bid = float(request.POST['bid'])
+        listing = Listing.objects.get(pk=id)
+        if new_bid > listing.current_bid.new_bid:
+            update_bid = Bid(user=request.user, new_bid=new_bid)
+            update_bid.save()
+            listing.current_bid = update_bid
+            listing.save()
+            return render (request, "auctions/listing.html", {
+                "listing": listing,
+                "message": "You're the highest bidder!"
+            })
+        else:
+            return render (request, "auctions/listing.html", {
+                "listing": listing,
+                "message": "Enter a higher bid amount"
+            })
     else:
-        return render (request, "auctions/listing.html", {
-            "listing": listing,
-            "message": "Enter a higher bid amount"
-        })
+        return render (request, "auctions/listing.html")
     
 # Figure out how the hell I got bidding to work??? I have absolutely no idea.
 
