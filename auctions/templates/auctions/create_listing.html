@@ -12,7 +12,7 @@
         <label for="category">Category:</label> 
         <select name="listing_category" id="category" required>
             {% for category in categories %}
-                <option value="{{ category }}">{{ category }}</option>
+                <option value="{{ category.category_name }}">{{ category.category_name }}</option>
             {% endfor %}
         </select><br>
         <label for="image_url">Image URL (optional):</label>

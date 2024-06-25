@@ -34,26 +34,27 @@ def create_listing(request):
                 title = request.POST['listing_title']
                 description = request.POST['listing_description']
                 imageURL = request.POST['listing_image_url']
-                price = request.POST['listing_start_price']
-                category = request.POST['listing_category']
-                categoryData = Category.objects.get(categoryName=category)
-                seller = request.user.username
+                start_price = request.POST['listing_start_price']
+                category_name = request.POST['listing_category']
+                category = Category.objects.get(category_name=category_name)
                 user = request.user
-                starting_price = Bid(starting_price=float(price), user=user)
-                starting_price.save()
+                # Price will be from creating a new Bid
+                starting_bid = Bid(new_bid=float(start_price), user=user)
+                starting_bid.save()
                 # Create new listing
-                newListing = Listing(
+                new_listing = Listing(
                     title=title,
                     description=description,
                     imageURL=imageURL,
-                    price=float(starting_price),
-                    category=categoryData,
-                    seller=seller
+                    current_bid=starting_bid,
+                    category=category,
+                    seller=user
                 )
-                newListing.save()
+                new_listing.save()
                 return HttpResponseRedirect(reverse("auctions:index"))
             except ValueError as e:
                 print(f"Value Error: {e}") 
+
 
 
 def index(request):
@@ -79,14 +80,8 @@ def listing(request, title):
             return render(request, "auctions/listing.html", {
                 "listing": listing,
             })
-    else:
-        if request.user.is_authenticated:
-            new_bid_price = ...
-            if new_bid_price > listing.price:
-                listing.price = new_bid_price
-                listing.save()
-            return redirect("auctions:listing", title=title)
-        return redirect("auctions:listing", title=title)
+
+
 
 
 def login_view(request):
@@ -113,8 +108,25 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("auctions:index"))
 
 
-def new_bid(request):
-    return
+def new_bid(request, id):
+    new_bid = float(request.POST['bid'])
+    listing = Listing.objects.get(pk=id)
+    if new_bid > listing.current_bid.new_bid:
+        update_bid = Bid(user=request.user, new_bid=new_bid)
+        update_bid.save()
+        listing.current_bid = update_bid
+        listing.save()
+        return render (request, "auctions/listing.html", {
+            "listing": listing,
+            "message": "You're the highest bidder!"
+        })
+    else:
+        return render (request, "auctions/listing.html", {
+            "listing": listing,
+            "message": "Enter a higher bid amount"
+        })
+    
+# Figure out how the hell I got bidding to work??? I have absolutely no idea.
 
 
 def register(request):
@@ -138,7 +150,7 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse("auctions:index"))
     else:
         return render(request, "auctions/register.html")
 

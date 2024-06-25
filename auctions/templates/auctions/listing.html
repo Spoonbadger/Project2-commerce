@@ -21,14 +21,15 @@
 
     <p>
         Description: {{ listing.description }}<br>
-        Price: ${{ listing.price }}<br>
+        Price: ${{ listing.current_bid.new_bid }}<br>
+        Highest bidder: {{ listing.current_bid.user.username }}<br>
         Image: {{ listing.imageURL }}<br>
         Seller: {{ listing.seller.username }}<br>
     </p>
-    <form action="{% url 'auctions:listing' title=listing.title %}" method="POST">
+    <form action="{% url 'auctions:new_bid' id=listing.id %}" method="POST">
         {% csrf_token %}
         <label>Bid: $</label>
-        <input type="number" min="{{ listing.price }}" step="any" placeholder="{{ listing.price }}" name="bid">
+        <input type="number" min="{{ listing.current_bid.new_bid }}" step="any" placeholder="{{ listing.current_bid.new_bid }}" name="bid" required>
         <button type="submit" class="btn btn-success" name="submit_bid">Submit Bid</button>
     </form>
 

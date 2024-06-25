@@ -8,8 +8,12 @@
             {% for listing in watchlistings %}
                 <li>
                     <a href="{% url 'auctions:listing' title=listing.title %}">{{ listing.title }}</a><br>
-                    {{ listing.price }}
+                    ${{ listing.current_bid.new_bid }}
                 </li><br>
+            {% empty %}
+            <p>
+                No items in watchlist yet...
+            </p>
             {% endfor %}
         </ul>
     {% endif %}

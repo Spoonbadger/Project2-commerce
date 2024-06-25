@@ -9,7 +9,7 @@
                 <li>
                     <a href="{% url 'auctions:listing' title=listing.title %}" class="btn btn-link">{{ listing.title }}</a><br>
                     Description: {{ listing.description }}<br>
-                    Current Price: ${{ listing.price }}<br>
+                    Current Price: ${{ listing.current_bid.new_bid }}<br>
                     ImageURL: {{ listing.imageURL }}<br>
                     Seller: {{ listing.seller.username }}
                 </li><br>
