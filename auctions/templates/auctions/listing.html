@@ -26,16 +26,29 @@
         Image: {{ listing.imageURL }}<br>
         Seller: {{ listing.seller.username }}<br>
     </p>
-    <form action="{% url 'auctions:new_bid' id=listing.id %}" method="POST">
-        {% csrf_token %}
-        <label>Bid: $</label>
-        <input type="number" min="{{ listing.current_bid.new_bid }}" step="any" placeholder="{{ listing.current_bid.new_bid }}" name="bid" required>
-        {% if user.is_authenticated %}
-            <button type="submit" class="btn btn-success" name="submit_bid">Submit Bid</button>
-        {% else %}
-            <a href="{% url 'auctions:login' %}">Login to place bid</a>
+
+    {% if is_active %}
+        <form action="{% url 'auctions:new_bid' id=listing.id %}" method="POST">
+            {% csrf_token %}
+            <label>Bid: $</label>
+            <input type="number" min="{{ listing.current_bid.new_bid }}" step="any" placeholder="{{ listing.current_bid.new_bid }}" name="bid" required>
+            {% if user.is_authenticated %}
+                <button type="submit" class="btn btn-success" name="submit_bid">Submit Bid</button>
+            {% else %}
+                <a href="{% url 'auctions:login' %}">Login to place bid</a>
+            {% endif %}
+        </form>
+
+        {% if userowner %}
+            <br>
+            <form action="{% url 'auctions:close_auction' id=listing.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" name="close_auction">Close Auction</button>
+            </form>
         {% endif %}
-    </form>
+    {% else %}
+        {{ message }}
+    {% endif %}
 
 {% endblock %}
 

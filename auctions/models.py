@@ -25,7 +25,7 @@ class Listing(models.Model):
     description = models.TextField()
     imageURL = models.URLField(max_length=200, blank=True)
     current_bid = models.ForeignKey('Bid', on_delete=models.CASCADE, related_name="listing", default=0)
-    isActive = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     seller = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, related_name="seller")
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name="category")
 

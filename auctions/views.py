@@ -20,6 +20,17 @@ def categories(request):
         return render(request, "auctions/index.html", {
             "listings": category_listings
         })
+    
+
+def close_auction(request, id):
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=id)
+        listing.is_active = False
+        listing.save()
+        return render (request, "auctions/listing.html", {
+            "listing": listing,
+            "message": "Auction is closed."
+        })
 
 
 def create_listing(request):
@@ -58,7 +69,7 @@ def create_listing(request):
 
 
 def index(request):
-        active_listings = Listing.objects.filter(isActive=True)
+        active_listings = Listing.objects.filter(is_active=True)
         return render(request, "auctions/index.html", {
             "listings": active_listings,
         })
@@ -70,11 +81,20 @@ def listing(request, title):
         if request.user.is_authenticated:
             user = request.user
             in_watchlist = False
+            # Check if is active
+            is_active = listing.is_active
+            # Check if the person signed in is the owner of the listing, assume not.
+            userowner = False
+            if user.username == listing.seller.username:
+                userowner = True
+
             if listing in user.watchlist.all():
                 in_watchlist = True
             return render(request, "auctions/listing.html", {
                 "listing": listing,
-                "in_watchlist": in_watchlist
+                "in_watchlist": in_watchlist,
+                "userowner": userowner,
+                "is_active": is_active,
             })
         else:
             return render(request, "auctions/listing.html", {
