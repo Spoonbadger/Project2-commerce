@@ -132,6 +132,7 @@ def new_bid(request, id):
     if request.user.is_authenticated:
         new_bid = float(request.POST['bid'])
         listing = Listing.objects.get(pk=id)
+        is_active = listing.is_active
         if new_bid > listing.current_bid.new_bid:
             update_bid = Bid(user=request.user, new_bid=new_bid)
             update_bid.save()
@@ -139,11 +140,13 @@ def new_bid(request, id):
             listing.save()
             return render (request, "auctions/listing.html", {
                 "listing": listing,
+                "is_active": is_active,
                 "message": "You're the highest bidder!"
             })
         else:
             return render (request, "auctions/listing.html", {
                 "listing": listing,
+                "is_active": is_active,
                 "message": "Enter a higher bid amount"
             })
     else:
@@ -203,3 +206,16 @@ def remove_from_watchlist(request, title):
         listing = Listing.objects.get(title=title)
         user.watchlist.remove(listing)
         return HttpResponseRedirect (reverse("auctions:listing", args=(title, )))
+    
+
+    # NEXT TODO: working on this function, so the user can see items they have won then work on active_bids page for active items user have bid on.
+def wins(request):
+    if request.user.is_authenticated:
+        closed_listings = Listing.objects.filter(is_active=False)
+        return render(request, "auctions/wins.html", {
+            "listings": closed_listings,
+        })
+    
+
+def active_bids(request):
+    ...

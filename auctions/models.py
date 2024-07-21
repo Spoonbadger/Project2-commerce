@@ -4,8 +4,10 @@ from django.db import models
 
 class Bid(models.Model):
     new_bid = models.DecimalField(max_digits=10, blank=True, decimal_places=2)
-    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="bidding_user")
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"{self.user} new bid: ${self.new_bid}"
 
 class Category(models.Model):
     category_name = models.CharField(max_length=64)
@@ -17,7 +19,7 @@ class Category(models.Model):
 class Comments(models.Model):
     comment = ...
     user = ...
-    item_listing = ...
+    item_listing = models.ForeignKey('Listing', on_delete=models.SET_NULL, null=True)
 
 
 class Listing(models.Model):
