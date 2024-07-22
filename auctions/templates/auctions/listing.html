@@ -38,6 +38,7 @@
                 <a href="{% url 'auctions:login' %}">Login to place bid</a>
             {% endif %}
         </form>
+        {{ message }}<br>
 
         {% if userowner %}
             <br>
@@ -46,7 +47,6 @@
                 <button type="submit" class="btn btn-danger" name="close_auction">Close Auction</button>
             </form>
         {% endif %}
-        {{ message }}
     {% endif %}
 
 {% endblock %}

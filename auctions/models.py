@@ -9,6 +9,7 @@ class Bid(models.Model):
     def __str__(self):
         return f"{self.user} new bid: ${self.new_bid}"
 
+
 class Category(models.Model):
     category_name = models.CharField(max_length=64)
 
@@ -30,6 +31,7 @@ class Listing(models.Model):
     is_active = models.BooleanField(default=True)
     seller = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, related_name="seller")
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name="category")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title

@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -9,7 +10,7 @@ from .models import User, Listing, Category, Bid
 
 def categories(request):
     if request.method == "GET":
-        categories = Category.objects.all()
+        categories = Category.objects.all().order_by('category_name')
         return render(request, "auctions/categories.html", {
             "categories": categories,
         })
@@ -33,6 +34,7 @@ def close_auction(request, id):
         })
 
 
+@login_required
 def create_listing(request):
     if request.method == "GET":
         allCategories = Category.objects.all()
@@ -69,7 +71,7 @@ def create_listing(request):
 
 
 def index(request):
-        active_listings = Listing.objects.filter(is_active=True)
+        active_listings = Listing.objects.filter(is_active=True).order_by('created_at')
         return render(request, "auctions/index.html", {
             "listings": active_listings,
         })
@@ -128,11 +130,16 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("auctions:index"))
 
 
+@login_required
 def new_bid(request, id):
     if request.user.is_authenticated:
+        user = request.user
         new_bid = float(request.POST['bid'])
         listing = Listing.objects.get(pk=id)
         is_active = listing.is_active
+        userowner = False
+        if user.username == listing.seller.username:
+            userowner = True
         if new_bid > listing.current_bid.new_bid:
             update_bid = Bid(user=request.user, new_bid=new_bid)
             update_bid.save()
@@ -141,13 +148,15 @@ def new_bid(request, id):
             return render (request, "auctions/listing.html", {
                 "listing": listing,
                 "is_active": is_active,
-                "message": "You're the highest bidder!"
+                "message": "You're the highest bidder!",
+                "userowner": userowner,
             })
         else:
             return render (request, "auctions/listing.html", {
                 "listing": listing,
                 "is_active": is_active,
-                "message": "Enter a higher bid amount"
+                "message": "Enter a higher bid amount",
+                "userowner": userowner,
             })
     else:
         return render (request, "auctions/listing.html")
@@ -167,7 +176,7 @@ def register(request):
                 "message": "Passwords must match."
             })
 
-        # Attempt to create new user
+        # Create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
@@ -209,12 +218,17 @@ def remove_from_watchlist(request, title):
     
 
     # NEXT TODO: working on this function, so the user can see items they have won then work on active_bids page for active items user have bid on.
+@login_required
 def wins(request):
-    if request.user.is_authenticated:
-        closed_listings = Listing.objects.filter(is_active=False)
-        return render(request, "auctions/wins.html", {
-            "listings": closed_listings,
-        })
+    user = request.user
+    won_listings = Listing.objects.filter(is_active=False, current_bid__user=user)
+    watchlistings = user.watchlist.all()
+    missed_listings = watchlistings.filter(is_active=False).exclude(current_bid__user=user)
+    
+    return render(request, "auctions/wins.html", {
+        "listings": won_listings,
+        "missed_listings": missed_listings,
+    })
     
 
 def active_bids(request):
