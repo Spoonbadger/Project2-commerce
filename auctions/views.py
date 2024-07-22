@@ -71,7 +71,7 @@ def create_listing(request):
 
 
 def index(request):
-        active_listings = Listing.objects.filter(is_active=True).order_by('created_at')
+        active_listings = Listing.objects.filter(is_active=True).order_by('-created_at')
         return render(request, "auctions/index.html", {
             "listings": active_listings,
         })
@@ -92,11 +92,18 @@ def listing(request, title):
 
             if listing in user.watchlist.all():
                 in_watchlist = True
+
+            # Display a winning message is the listing is closed and the user is the highest bidder.
+            won = False
+            if listing.current_bid.user == user and not is_active:
+                won = True
+
             return render(request, "auctions/listing.html", {
                 "listing": listing,
                 "in_watchlist": in_watchlist,
                 "userowner": userowner,
                 "is_active": is_active,
+                "won": won,
             })
         else:
             return render(request, "auctions/listing.html", {
@@ -217,19 +224,17 @@ def remove_from_watchlist(request, title):
         return HttpResponseRedirect (reverse("auctions:listing", args=(title, )))
     
 
-    # NEXT TODO: working on this function, so the user can see items they have won then work on active_bids page for active items user have bid on.
 @login_required
 def wins(request):
     user = request.user
     won_listings = Listing.objects.filter(is_active=False, current_bid__user=user)
     watchlistings = user.watchlist.all()
     missed_listings = watchlistings.filter(is_active=False).exclude(current_bid__user=user)
-    
+
     return render(request, "auctions/wins.html", {
         "listings": won_listings,
         "missed_listings": missed_listings,
     })
     
 
-def active_bids(request):
-    ...
+#NEXT TODO: Add feature to enable comments.
