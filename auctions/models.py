@@ -17,10 +17,13 @@ class Category(models.Model):
         return self.category_name
     
 
-class Comments(models.Model):
-    comment = ...
-    user = ...
-    item_listing = models.ForeignKey('Listing', on_delete=models.SET_NULL, null=True)
+class Comment(models.Model):
+    comment = models.CharField(max_length=180)
+    comment_listing = models.ForeignKey('Listing', on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="commentor")
+
+    def __str__(self):
+        return f"{self.user} commented on {self.comment_listing}"
 
 
 class Listing(models.Model):

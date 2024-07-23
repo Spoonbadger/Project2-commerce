@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User, Listing, Category, Bid
+from .models import User, Listing, Category, Bid, Comment
 
 
 def categories(request):
@@ -32,6 +32,15 @@ def close_auction(request, id):
             "listing": listing,
             "message": "Auction is closed."
         })
+
+
+@login_required
+def comments(request, id):
+    if request.method == "POST":
+        new_comment = request.POST['new_comment']
+        comments = Comment.objects.get(pk=id)
+
+
 
 
 @login_required

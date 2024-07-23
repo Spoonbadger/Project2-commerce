@@ -53,6 +53,23 @@
         <p>You won this auction!</p>
     {% endif %}
 
+    <!-- Display comments, comment box first if the user is logged in. -->
+    {% if user.is_authenticated %}
+        {% csrf_token %}
+        <form><br>
+            <input type="text">
+            <button type="submit" class="btn btn-light" name="add_comment">Comment</button>
+        </form>
+    {% endif %}
+    <ul>
+    {% for comment in comments %}
+        <li>
+            {{ comment.comment }} - {{ comment.user.username }}
+        </li>
+    {% endfor %}
+    </ul>
+
+
 {% endblock %}
 
 
