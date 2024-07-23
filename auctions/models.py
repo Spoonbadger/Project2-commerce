@@ -12,8 +12,7 @@ class Bid(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=64)
-    category_listing_item = models.ForeignKey('Listing', on_delete=models.SET_NULL, null=True, related_name="categories")
-    
+
     def __str__(self):
         return self.category_name
     
@@ -31,7 +30,7 @@ class Comment(models.Model):
 class Listing(models.Model):
     title = models.CharField(max_length=64)
     description = models.TextField()
-    imageURL = models.URLField(max_length=200, blank=True)
+    imageURL = models.URLField(max_length=220, blank=True)
     current_bid = models.ForeignKey('Bid', on_delete=models.CASCADE, related_name="listing", default=0)
     is_active = models.BooleanField(default=True)
     seller = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, related_name="seller")

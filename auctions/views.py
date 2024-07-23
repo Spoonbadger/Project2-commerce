@@ -10,14 +10,14 @@ from .models import User, Listing, Category, Bid, Comment
 
 def categories(request):
     if request.method == "GET":
-        categories = Category.objects.filter(isActive=True).order_by('category_name')
+        categories = Category.objects.all().order_by('category_name')
         return render(request, "auctions/categories.html", {
             "categories": categories,
         })
     else:
         selected_category_id = request.POST['selected_category']
         selected_category = Category.objects.get(pk=selected_category_id)
-        category_listings = Listing.objects.filter(category=selected_category)
+        category_listings = Listing.objects.filter(category=selected_category, is_active=True)
         return render(request, "auctions/index.html", {
             "listings": category_listings
         })
@@ -148,8 +148,10 @@ def listing(request, title):
                 "comments": comments,
             })
         else:
+            comments = Comment.objects.filter(comment_listing=listing).order_by('-created_at')
             return render(request, "auctions/listing.html", {
                 "listing": listing,
+                "comments": comments,
             })
 
 

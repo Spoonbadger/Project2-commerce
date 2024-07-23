@@ -23,7 +23,7 @@
         Description: {{ listing.description }}<br>
         Price: ${{ listing.current_bid.new_bid }}<br>
         Highest bidder: {{ listing.current_bid.user.username }}<br>
-        Image: {{ listing.imageURL }}<br>
+        <img src="{{ listing.imageURL }}" style="max-width: 450px;"><br>
         Seller: {{ listing.seller.username }}<br>
     </p>
 
