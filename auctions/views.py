@@ -10,14 +10,14 @@ from .models import User, Listing, Category, Bid, Comment
 
 def categories(request):
     if request.method == "GET":
-        categories = Category.objects.all().order_by('category_name')
+        categories = Category.objects.filter(isActive=True).order_by('category_name')
         return render(request, "auctions/categories.html", {
             "categories": categories,
         })
     else:
         selected_category_id = request.POST['selected_category']
         selected_category = Category.objects.get(pk=selected_category_id)
-        category_listings = Listing.objects.filter(isActive=True, category=selected_category)
+        category_listings = Listing.objects.filter(category=selected_category)
         return render(request, "auctions/index.html", {
             "listings": category_listings
         })
@@ -36,10 +36,40 @@ def close_auction(request, id):
 
 @login_required
 def comments(request, id):
-    if request.method == "POST":
-        new_comment = request.POST['new_comment']
-        comments = Comment.objects.get(pk=id)
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            user = request.user
+            listing = Listing.objects.get(pk=id)
+            comment = request.POST['new_comment']
+            new_comment = Comment(
+                comment = comment,
+                comment_listing = listing,
+                user = user,
+            )
+            print("New comment text:", comment)
+            new_comment.save()
+            comments = Comment.objects.filter(comment_listing=listing).order_by('-created_at')
+            # Check if the person signed in is the owner of the listing, assume not.
+            userowner = False
+            if user.username == listing.seller.username:
+                userowner = True
+            in_watchlist = False
+            if listing in user.watchlist.all():
+                in_watchlist = True
+            # Display a winning message is the listing is closed and the user is the highest bidder.
+            is_active = listing.is_active
+            won = False
+            if listing.current_bid.user == user and not is_active:
+                won = True
 
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+                "userowner": userowner,
+                "in_watchlist": in_watchlist,
+                "is_active": is_active,
+                "won": won,
+                "comments": comments,
+            })
 
 
 
@@ -107,12 +137,15 @@ def listing(request, title):
             if listing.current_bid.user == user and not is_active:
                 won = True
 
+            # Display comments
+            comments = Comment.objects.filter(comment_listing=listing).order_by('-created_at')
             return render(request, "auctions/listing.html", {
                 "listing": listing,
                 "in_watchlist": in_watchlist,
                 "userowner": userowner,
                 "is_active": is_active,
                 "won": won,
+                "comments": comments,
             })
         else:
             return render(request, "auctions/listing.html", {
@@ -153,6 +186,7 @@ def new_bid(request, id):
         new_bid = float(request.POST['bid'])
         listing = Listing.objects.get(pk=id)
         is_active = listing.is_active
+        comments = Comment.objects.filter(comment_listing=listing).order_by('-created_at')
         userowner = False
         if user.username == listing.seller.username:
             userowner = True
@@ -166,6 +200,7 @@ def new_bid(request, id):
                 "is_active": is_active,
                 "message": "You're the highest bidder!",
                 "userowner": userowner,
+                "comments": comments,
             })
         else:
             return render (request, "auctions/listing.html", {
@@ -173,6 +208,7 @@ def new_bid(request, id):
                 "is_active": is_active,
                 "message": "Enter a higher bid amount",
                 "userowner": userowner,
+                "comments": comments,
             })
     else:
         return render (request, "auctions/listing.html")
@@ -245,5 +281,3 @@ def wins(request):
         "missed_listings": missed_listings,
     })
     
-
-#NEXT TODO: Add feature to enable comments.

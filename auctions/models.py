@@ -12,18 +12,20 @@ class Bid(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=64)
-
+    category_listing_item = models.ForeignKey('Listing', on_delete=models.SET_NULL, null=True, related_name="categories")
+    
     def __str__(self):
         return self.category_name
     
 
 class Comment(models.Model):
     comment = models.CharField(max_length=180)
-    comment_listing = models.ForeignKey('Listing', on_delete=models.SET_NULL, null=True)
+    comment_listing = models.ForeignKey('Listing', on_delete=models.SET_NULL, null=True, related_name="comments")
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="commentor")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user} commented on {self.comment_listing}"
+        return f"{self.user.username}: {self.comment}"
 
 
 class Listing(models.Model):

@@ -55,17 +55,17 @@
 
     <!-- Display comments, comment box first if the user is logged in. -->
     {% if user.is_authenticated %}
-        {% csrf_token %}
-        <form><br>
-            <input type="text">
-            <button type="submit" class="btn btn-light" name="add_comment">Comment</button>
+        <form action="{% url 'auctions:comments' id=listing.id %}" method="POST">
+            {% csrf_token %}
+            <input type="text" name="new_comment" placeholder="Enter comment here">
+            <button type="submit" class="btn btn-info">Comment</button>
         </form>
     {% endif %}
-    <ul>
+    <ul><br>
     {% for comment in comments %}
-        <li>
-            {{ comment.comment }} - {{ comment.user.username }}
-        </li>
+        <ul>
+            {{ comment.user.username }}: {{ comment.comment }}
+        </ul>
     {% endfor %}
     </ul>
 
